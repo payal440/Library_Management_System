@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     UserName: {
         type: String,
-        required: true,
+        required: false,
         unique: true
     },
     emailId: {
@@ -28,25 +28,32 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: false,
         minlength: 6
     },
     stream: {
         type: String,
-        required: true
+        required: false
     },
     class: {
         type: String,
-        required: true
+        required: false
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    isGoogleUser: {
+        type: Boolean,
+        default: false
     },
     date: { type: Date, default: Date.now },
 });
 
 userSchema.methods.getJWT = async function(){
   const user = this;
-  const token = await jwt.sign({ _id: user._id }, "Libaray@8899",{expiresIn:"7d",
-  });
- 
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
   return token;
 }
 userSchema.methods.validatePassword = async function(passwordinputByUser) {

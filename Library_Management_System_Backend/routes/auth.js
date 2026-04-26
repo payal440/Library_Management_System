@@ -76,22 +76,21 @@ authRouter.post("/logout", (req, res) => {
 // Google OAuth Routes
 authRouter.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-authRouter.get("/auth/google/callback", 
-  passport.authenticate("google", { failureRedirect: "/login" }),
+authRouter.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "http://localhost:5173/login?error=Google+login+failed",
+  }),
   async (req, res) => {
     try {
       const token = await req.user.getJWT();
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 8 * 3600000),
-        httpOnly: true,
-        secure: false // Set to true if using HTTPS
-      });
-      // Redirect to frontend after successful login
-      res.redirect("http://localhost:5173/dashboard");
+      // Redirect to frontend with the JWT token so React can save it locally
+      res.redirect(`http://localhost:5173/dashboard?token=${token}`);
     } catch (err) {
-      res.redirect("http://localhost:5173/login?error=" + err.message);
+      res.redirect(`http://localhost:5173/login?error=${encodeURIComponent(err.message)}`);
     }
   }
 );
+
 
 module.exports = authRouter;

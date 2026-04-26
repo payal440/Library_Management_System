@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../Style/Dashboard.css";
 
@@ -13,11 +13,6 @@ const Dashboard = () => {
     const tokenFromUrl = searchParams.get("token");
     const tokenFromStorage = localStorage.getItem("token");
     const token = tokenFromUrl || tokenFromStorage;
-
-    console.log("=== Dashboard useEffect ===");
-    console.log("Token from URL:", tokenFromUrl);
-    console.log("Token from Storage:", tokenFromStorage);
-    console.log("Using token:", token);
 
     if (tokenFromUrl) {
       localStorage.setItem("token", tokenFromUrl);
@@ -34,18 +29,13 @@ const Dashboard = () => {
 
   const fetchUserData = async (token) => {
     try {
-      console.log("=== Fetching user data ===");
-      console.log("Token:", token);
-
       const response = await fetch("http://localhost:3000/profile", {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
-      console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -53,13 +43,9 @@ const Dashboard = () => {
       }
 
       const data = await response.json();
-      console.log("User data received:", data);
-
-      // The backend now returns user directly (not wrapped)
       setUser(data);
       setLoading(false);
     } catch (err) {
-      console.error("Fetch error:", err);
       setError(`Error: ${err.message}`);
       setLoading(false);
       localStorage.removeItem("token");
@@ -75,17 +61,9 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="dashboard-wrapper">
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          color: "white",
-          textAlign: "center",
-          flexDirection: "column"
-        }}>
+        <div className="alert-panel">
           <h2>⚠️ {error}</h2>
-          <p>Redirecting to login...</p>
+          <p>Redirecting to signup...</p>
         </div>
       </div>
     );
@@ -94,7 +72,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="dashboard-wrapper">
-        <div className="loading">⏳ Loading...</div>
+        <div className="loading">⏳ Loading your dashboard...</div>
       </div>
     );
   }
@@ -102,7 +80,7 @@ const Dashboard = () => {
   if (!user) {
     return (
       <div className="dashboard-wrapper">
-        <div className="loading">❌ No user data</div>
+        <div className="loading">❌ No user data available</div>
       </div>
     );
   }
@@ -110,70 +88,73 @@ const Dashboard = () => {
   return (
     <div className="dashboard-wrapper">
       <div className="dashboard-container">
-        <div className="dashboard-header">
-          <h1>📚 Library Management System</h1>
+        <div className="dashboard-banner">
+          <div>
+            <p className="banner-tag">Welcome back,</p>
+            <h1>{user?.Name || "Library User"}</h1>
+            <p className="banner-text">
+              Here’s your personalized library dashboard. Explore new books, manage your borrowings, and keep your account up to date.
+            </p>
+          </div>
           <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
 
-        <div className="profile-card">
-          <div className="profile-header">
-            <div className="avatar">
-              {user?.Name?.charAt(0).toUpperCase() || "U"}
-            </div>
-            <div className="profile-info">
-              <h2>{user?.Name || "User"}</h2>
-              <p className="email">{user?.emailId}</p>
-              {user?.isGoogleUser && (
-                <span className="google-badge">✓ Google User</span>
-              )}
-            </div>
-          </div>
-
-          <div className="profile-details">
-            <div className="detail-item">
-              <label>Username</label>
-              <p>{user?.UserName || "N/A"}</p>
+        <div className="dashboard-grid">
+          <section className="profile-card">
+            <div className="profile-header">
+              <div className="avatar">
+                {user?.Name?.charAt(0).toUpperCase() || "U"}
+              </div>
+              <div>
+                <h2>{user?.Name || "User"}</h2>
+                <p className="email">{user?.emailId}</p>
+                <span className="role-badge">Library Member</span>
+              </div>
             </div>
 
-            <div className="detail-item">
-              <label>Stream</label>
-              <p>{user?.stream || "Not specified"}</p>
+            <div className="profile-details">
+              <div className="detail-item">
+                <span>Username</span>
+                <strong>{user?.UserName || "Not set"}</strong>
+              </div>
+              <div className="detail-item">
+                <span>Stream</span>
+                <strong>{user?.stream || "Not specified"}</strong>
+              </div>
+              <div className="detail-item">
+                <span>Class</span>
+                <strong>{user?.class || "Not specified"}</strong>
+              </div>
+              <div className="detail-item">
+                <span>Member since</span>
+                <strong>{new Date(user?.date).toLocaleDateString()}</strong>
+              </div>
             </div>
+          </section>
 
-            <div className="detail-item">
-              <label>Class</label>
-              <p>{user?.class || "Not specified"}</p>
+          <section className="stats-card">
+            <h3>Quick Actions</h3>
+            <div className="stats-grid">
+              <div className="stat-item">
+                <h4>📚 Browse Books</h4>
+                <p>Explore the latest titles and categories.</p>
+              </div>
+              <div className="stat-item">
+                <h4>📋 My Borrowings</h4>
+                <p>Check current loans and due dates.</p>
+              </div>
+              <div className="stat-item">
+                <h4>⭐ Reservations</h4>
+                <p>Reserve books for future pickup.</p>
+              </div>
+              <div className="stat-item">
+                <h4>⚙️ Settings</h4>
+                <p>Update your profile and preferences.</p>
+              </div>
             </div>
-
-            <div className="detail-item">
-              <label>Member Since</label>
-              <p>{new Date(user?.date).toLocaleDateString()}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="quick-links">
-          <div className="link-card">
-            <h3>📚 Browse Books</h3>
-            <p>Explore our library collection</p>
-          </div>
-
-          <div className="link-card">
-            <h3>📋 My Borrowings</h3>
-            <p>View your borrowed books</p>
-          </div>
-
-          <div className="link-card">
-            <h3>⭐ Reservations</h3>
-            <p>Reserve books for later</p>
-          </div>
-
-          <div className="link-card">
-            <h3>⚙️ Settings</h3>
-            <p>Manage your account</p>
-          </div>
+          </section>
         </div>
       </div>
     </div>

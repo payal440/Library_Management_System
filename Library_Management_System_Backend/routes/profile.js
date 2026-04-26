@@ -15,12 +15,29 @@ profileRouter.get('/profile', userAuth, async (req, res) => {
 
 });
 
-profileRouter.patch('/profile/edit', userAuth,async(req,res)=>{
-    try{
+profileRouter.patch('/profile/edit', userAuth, async (req, res) => {
+    try {
         const userId = req.user._id;
-        const { name, email } = req.body;
-    }catch(err){
+        const updates = req.body;
+
+        const isValid = validateprofileEditData(req);
+        if (!isValid) {
+            return res.status(400).json({ message: 'Invalid profile update fields' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        Object.keys(updates).forEach((field) => {
+            user[field] = updates[field];
+        });
+
+        await user.save();
+        res.json({ message: 'Profile updated successfully', user });
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
-})
+});
 module.exports = profileRouter;

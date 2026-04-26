@@ -105,12 +105,6 @@ bookRouter.delete("/books/delete/:id", async (req, res) => {
     }
 
     // 2️⃣ Validation check 
-    if (book.reservedCopies > 0) {
-      return res.status(400).json({
-        message: "Cannot delete book with active reservations",
-      });
-    }
-
     if (book.availableCopies < book.totalCopies) {
       return res.status(400).json({
         message: "Cannot delete book that is currently borrowed",

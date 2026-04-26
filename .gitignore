@@ -1,0 +1,5 @@
+﻿# Do not commit generated dependencies or environment files
+Library_Management_System_Backend/node_modules
+Library_Management_System_Frontend/vite-project/node_modules
+Library_Management_System_Backend/.env
+Library_Management_System_Frontend/vite-project/.env

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "../../Style/SignUp.css";
+import "../Style/SignUp.css";
 
 const Signup = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const Signup = () => {
     }
 
     if (errorMsg) {
-      setError(`Login failed: ${decodeURIComponent(errorMsg)}`);
+      setError(`Login failed: ${decodeURIComponent (errorMsg)}`);
     }
   }, [searchParams, navigate]);
 
